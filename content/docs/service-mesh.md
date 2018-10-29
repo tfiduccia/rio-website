@@ -28,21 +28,22 @@ NAME       IMAGE                    CREATED          SCALE     STATE     ENDPOIN
 test/svc   ibuildthecloud/demo:v1   17 seconds ago   3         active    http://svc.test.8gr18g.lb.rancher.cloud   
 
 # Stage new version, updating just the docker image and assigning it to "v2" version.
-$ rio stage --image=ibuildthecloud/demo:v2 test/svc:v2
+$ rio stage --image=ibuildthecloud/demo:v3 test/svc:v3
 
 # Notice a new URL was created for your staged service
 $ rio ps
 NAME          IMAGE                    CREATED        SCALE     STATE     ENDPOINT                                     DETAIL
 test/svc      ibuildthecloud/demo:v1   10 hours ago   3         active    http://svc.test.8gr18g.lb.rancher.cloud      
-test/svc:v2   ibuildthecloud/demo:v2   10 hours ago   3         active    http://svc-v2.test.8gr18g.lb.rancher.cloud   
+test/svc:v3   ibuildthecloud/demo:v3   10 hours ago   3         active    http://svc-v3.test.8gr18g.lb.rancher.cloud   
 
 # Access current service
 $ curl -s http://svc.test.8gr18g.lb.rancher.cloud
 Hello World
 
 # Access staged service under new URL
-$ curl -s http://svc-v2.test.8gr18g.lb.rancher.cloud
-Hello World v2
+$ curl -s http://svc-
+.test.8gr18g.lb.rancher.cloud
+Hello World v3
 
 # Export to see stack file format
 $ rio export test
@@ -52,27 +53,27 @@ services:
     ports:
     - 80/http
     revisions:
-      v2:
-        image: ibuildthecloud/demo:v2
+      v3:
+        image: ibuildthecloud/demo:v3
         scale: 3
     scale: 3
 
 # Send some production traffic to new version
-$ rio weight test/svc:v2=50%
+$ rio weight test/svc:v3=50%
 
 # See that 50% of traffic goes to new service
 $ curl -s http://svc.test.8gr18g.lb.rancher.cloud
 Hello World
 $ curl -s http://svc.test.8gr18g.lb.rancher.cloud
-Hello World v2
+Hello World v3
 
 # Happy with the new version we promote the stage version to be the primary
-$ rio promote test/svc:v2
+$ rio promote test/svc:v3
 
-# All new traffic is v2
+# All new traffic is v3
 $ curl -s http://svc.test.8gr18g.lb.rancher.cloud
-Hello World v2
+Hello World v3
 $ curl -s http://svc.test.8gr18g.lb.rancher.cloud
-Hello World v2
+Hello World v3
 
 ```
